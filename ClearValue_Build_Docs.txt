@@ -1,0 +1,179 @@
+﻿ClearValue
+AI-Powered TCO & Business Case Generator
+Built for Everpure Associate Value Consultant Interview
+Sambhav Lamichhane  |  March 2026
+
+Document Contents
+• PRD (Product Requirements Document)
+• Tech Stack Definition
+• User Flow Diagram Reference
+• Build Plan (PLAN.md) for Cursor
+
+1. Product Requirements Document (PRD)
+1.1 Overview
+ClearValue is an AI-powered TCO (Total Cost of Ownership) and Business Case Generator built to help enterprise sales and value consulting teams translate complex infrastructure decisions into defensible financial narratives. A user inputs their current storage environment, and ClearValue outputs a 3-year TCO comparison, value lever breakdown, and an AI-generated executive summary ready for a CFO or CIO audience.
+1.2 Problem Statement
+Problem 1: Value conversations happen too late
+By the time a Value Consultant is pulled into a deal, the customer is already deep in vendor evaluation. The economic case is built reactively rather than proactively. Sales reps need a self-serve tool to run a first-pass value snapshot in early discovery before a VC is even involved.
+Problem 2: Benchmark libraries are static and stale
+Every new product release makes existing TCO templates outdated. Someone has to manually update them. A tool with configurable, documented assumptions solves this at scale.
+Problem 3: Technical-to-financial translation does not scale
+Sales engineers speak in IOPS and throughput. CFOs speak in NPV and payback periods. Value consultants sit in between but cannot be in every conversation. A tool that auto-converts technical inputs into financial outputs democratizes that translation across the entire sales org.
+1.3 Target Users
+UserContextNeedValue ConsultantPre-sales, deal qualificationRapid first-pass business case for discovery callsSales RepEarly discoveryQuick economic narrative to share with customer financeRecruiter / Hiring MgrDemo contextSee the tool framing the problem and solution1.4 Success Criteria
+• A non-technical user can complete all inputs and get a full business case in under 3 minutes
+• The executive summary reads as something a CFO would actually receive
+• All assumptions are visible and defensible on hover
+• The tool works cleanly on a laptop screen without scrolling issues during a demo
+1.5 Screens Overview
+ScreenNamePurposeScreen 0Landing / HeroEstablish credibility, frame the product, CTAScreen 1InputsCompany profile + storage environment + ops inputsScreen 2TCO DashboardKPI cards, scenario toggle, comparison charts, lever breakdownScreen 3AI SummaryGemini-generated CFO-ready executive summary memo1.6 Company Size Presets
+FieldSMBMid-MarketEnterpriseStorage TB505005,000Storage Admins (FTE)0.51.55Power Cost ($/kWh)$0.12$0.10$0.08Downtime Cost ($/hr)$5,000$50,000$200,000Array Cost ($/TB)$80$65$50Refresh Cycle (years)4451.7 Financial Model — Four Value Levers
+Lever 1: Power & Cooling Savings
+legacyPowerCost = storageTB × 22.5 × 8760 × kwhRate × 1.4 / 1000
+everpurePowerCost = storageTB × 2.5 × 8760 × kwhRate × 1.4 / 1000
+powerSavings = legacyPowerCost - everpurePowerCost
+Source: Everpure published 10x power efficiency advantage. Legacy avg 22.5W/TB, Everpure avg 2.5W/TB. Cooling multiplier 1.4x = industry standard PUE delta.
+Lever 2: Refresh & Migration Avoidance
+refreshCostPerCycle = (arrayPricePerTB × storageTB × 0.80) + migrationLaborCost
+annualRefreshCost = refreshCostPerCycle / refreshCycleYears
+refreshSavings = annualRefreshCost  // Everpure Evergreen = $0
+Source: Industry standard forklift estimate. Everpure Evergreen subscription eliminates refresh cost entirely.
+Lever 3: Admin Labor Reduction
+currentAdminCost = adminFTEs × adminFullyLoadedCost × (adminTimePct / 100)
+adminSavings = currentAdminCost × 0.32
+Source: ESG Economic Validation of Pure1, 2024. 32% reduction in storage administration labor.
+Lever 4: Downtime Risk Mitigation
+legacyDowntimeHours = 4.38   // 99.99% availability
+everpureDowntimeHours = 0.0526  // 99.9999% availability
+downtimeSavings = (4.38 - 0.0526) × downtimeCostPerHour
+Source: Availability delta. Legacy 99.99% = 4.38 hrs/yr. Everpure SLA 99.9999% = 0.053 hrs/yr.
+Summary Metrics
+annualSavings = powerSavings + refreshSavings + adminSavings + downtimeSavings
+scenarioMultiplier: conservative=0.60, base=1.00, optimistic=1.25
+totalSavings3yr = annualSavings × 3 × scenarioMultiplier
+npv = Σ (annualSavings × multiplier / 1.08^year) for years 1-3
+paybackMonths = (everpurePremium / annualSavings) × 12
+roi = ((totalSavings3yr - everpurePremium) / everpurePremium) × 100
+1.8 Design Tokens
+TokenValueUsagenavy-900#0F172APage backgroundnavy-800#1A2744Primary brand navynavy-700#1E293BCard backgroundorange-500#F97316Primary accent, CTA buttons, savings valuesslate-100#F1F5F9Primary textslate-400#94A3B8Secondary text, field labels1.9 Out of Scope (V1)
+• PDF export
+• Shareable URLs
+• User accounts or saved analyses
+• Backend API or database
+• Multi-currency support
+• CRM integration
+
+2. Tech Stack Definition
+2.1 Core Framework
+TechnologyVersionReasonReact18.xComponent model ideal for multi-step wizard with shared stateTypeScript5.xType safety on financial model prevents silent calculation errorsVite5.xFast dev server, same as CardSense — familiar setupTailwind CSS3.xUtility-first, fast to build dark enterprise UI, no CSS file sprawlRecharts2.xReact-native charting. Supports BarChart. Lightweight.React Routerv6URL-based navigation, enables back button, nav guardsLucide ReactlatestClean, tree-shakeable icons for lever cards and nav@radix-ui/tooltip1.xAccessible headless tooltips for assumption annotationsGemini 1.5 FlashAPIFast, familiar from CardSense, handles prose generation wellVercelDeploySame as CardSense, zero-config, handles env vars cleanly2.2 File Structure
+clearvalue/
+├── src/
+│   ├── components/
+│   │   ├── ui/           Button, Card, KPICard, Tooltip, StepIndicator
+│   │   ├── screens/      LandingScreen, InputsScreen, DashboardScreen, SummaryScreen
+│   │   └── charts/       ComparisonBarChart, LeverBreakdownChart
+│   ├── context/          InputContext, ResultsContext
+│   ├── lib/              tcoModel.ts, benchmarks.ts, geminiApi.ts, formatters.ts
+│   ├── types/            index.ts (all shared interfaces)
+│   └── App.tsx           Router setup
+├── .env                  VITE_GEMINI_API_KEY
+└── tailwind.config.ts    Custom color tokens
+2.3 State Management
+Two React contexts only — no Redux or Zustand needed:
+• InputContext: stores all UserInputs from Screen 1, exposes updateField() and applyPreset()
+• ResultsContext: derives TCOResults from InputContext via useMemo, stores scenario (conservative/base/optimistic)
+2.4 Gemini API Call Pattern
+const response = await fetch(GEMINI_ENDPOINT, {
+  method: 'POST',
+  body: JSON.stringify({
+    model: 'gemini-1.5-flash',
+    contents: [{ parts: [{ text: buildPrompt(params) }] }],
+    generationConfig: { temperature: 0.4, maxOutputTokens: 400 }
+  })
+});
+2.5 What NOT to Use
+ToolWhy NotNext.jsSSR adds complexity with no benefit for a demo toolRedux / ZustandOverkill — two React contexts are sufficientMaterial UI / ChakraToo opinionated, fights the custom Everpure dark themeChart.jsImperative API is messy in React, Recharts is purpose-builtAxiosNative fetch is sufficient for one API call
+3. User Flow Diagram
+(See the visual diagram generated in the conversation. Reference this section for written flow description.)
+3.1 Primary Flow (Happy Path)
+• User arrives at Screen 0 (Landing) — clicks 'Build Your Value Case'
+• Navigates to Screen 1 (Inputs) — clicks preset (e.g. Mid-Market), all fields autofill
+• User reviews/overrides any fields — clicks 'Calculate Value'
+• Screen 2 (Dashboard) loads — KPI cards, scenario toggle, charts, lever breakdown with tooltips
+• User optionally toggles Conservative / Optimistic scenario — numbers update reactively
+• User clicks 'Generate Executive Summary'
+• Screen 3 (Summary) loads — clicks 'Generate', Gemini returns 4-paragraph memo
+• User clicks 'Copy to Clipboard' — done
+3.2 Back Navigation
+• Screen 2 has '← Edit Inputs' button — returns to Screen 1 with all values preserved
+• Screen 3 has '← Back to Dashboard' button — returns to Screen 2
+• Screen 3 has 'Start New Analysis' button — resets all state, returns to Screen 0
+3.3 Navigation Guard
+If a user navigates directly to /dashboard or /summary without having entered inputs (storageTB === 0), React Router redirects them to /inputs. This prevents broken states during demos.
+3.4 Error States
+• Input validation: 'Calculate Value' button disabled if storageTB is 0. Inline error shown if required fields are empty.
+• Gemini API error: fallback message shown, KPI cards still visible. 'Regenerate' button remains active.
+• Payback period Infinity (zero savings): display 'N/A' instead of a division error.
+
+4. Build Plan (PLAN.md)
+Build in this exact order. Do not skip phases. Each phase must be visually confirmed before starting the next.
+Phase 0 — Project Scaffold
+Scaffold Vite + React + TypeScript. Install all dependencies. Configure Tailwind with custom color tokens. Create all empty placeholder files in the exact file structure from TECH_STACK.md.
+Confirm: npm run dev starts clean. Tailwind custom colors resolve. All files exist.
+Phase 1 — Types & Financial Model (Build first, no UI)
+• src/types/index.ts: UserInputs, TCOResults, ScenarioType, CompanySize interfaces
+• src/lib/benchmarks.ts: PRESETS object with SMB, Mid-Market, Enterprise values
+• src/lib/tcoModel.ts: calculateTCO(inputs, scenario) pure function with all four lever formulas
+• src/lib/formatters.ts: formatCurrency and formatCurrencyFull
+Confirm: calculateTCO with mid-market defaults returns ~$800K-$1.2M/yr savings. No TypeScript errors.
+Phase 2 — Context & State
+• InputContext: stores UserInputs, exposes updateField(), applyPreset()
+• ResultsContext: derives TCOResults via useMemo from InputContext, stores scenario
+• App.tsx: wrap in both providers, set up React Router with nav guards
+Confirm: useResults() returns non-zero values. applyPreset('enterprise') fills all fields.
+Phase 3 — Shared UI Components
+• Button.tsx: primary (orange), secondary (border), ghost variants
+• Card.tsx: dark card wrapper bg-navy-700
+• KPICard.tsx: label, value, subtitle, accent (orange) props
+• Tooltip.tsx: Radix wrapper, dark tooltip styling
+• StepIndicator.tsx: 4 steps, active step from current route
+Phase 4 — Screen 0: Landing Page
+• ClearValue logo text + tagline + subheading
+• Primary CTA button navigates to /inputs
+• Three value props with Lucide icons
+• Footer with name
+Phase 5 — Screen 1: Inputs
+• Section A: Company Name, Industry dropdown, preset buttons (SMB / Mid-Market / Enterprise)
+• Section B: storageTB, arrayPricePerTB, refreshCycleYears, migrationLaborCost — all with Tooltips
+• Section C: kwhRate, adminFTEs, adminFullyLoadedCost, adminTimePct slider, downtimeCostPerHour — all with Tooltips
+• 'Calculate Value' button navigates to /dashboard, disabled if storageTB === 0
+Phase 6 — Screen 2: TCO Dashboard
+• Step 6a: ComparisonBarChart (grouped bars, Legacy gray vs Everpure orange, 4 categories)
+• Step 6b: Four KPICards in a row (3yr Savings, NPV, Payback, ROI)
+• Scenario toggle (Conservative / Base / Optimistic) — updates ResultsContext reactively
+• ComparisonBarChart full width below toggle
+• Four lever cards (2x2 grid) with icons, annual/3yr savings, description, Tooltip
+• '← Edit Inputs' and 'Generate Executive Summary' nav buttons
+Phase 7 — Screen 3: AI Summary
+• geminiApi.ts: SummaryParams interface, buildPrompt(), generateExecutiveSummary()
+• SummaryScreen: left panel (memo header + idle/loading/generated/error states)
+• Right panel: 4 KPICards (smaller)
+• 'Regenerate' and 'Copy to Clipboard' buttons
+• '← Back to Dashboard' and 'Start New Analysis' nav buttons
+Phase 8 — Polish & Deploy
+• Visual pass: consistent spacing, hover transitions, shadow-lg on cards
+• Edge cases: input validation, Infinity payback = N/A, API error fallback
+• Deploy to Vercel: push to GitHub, import project, add VITE_GEMINI_API_KEY env var
+
+Demo Script (Recruiter Call)
+Opening line — say this before opening the laptop:
+"I was thinking about what makes the Value Consultant role hard at scale — specifically, that value conversations happen reactively rather than proactively. So I built a quick prototype of what a self-serve first-pass tool could look like."
+Then:
+• Click 'Build Your Value Case'
+• Click 'Mid-Market' preset — watch all fields fill
+• Click 'Calculate Value'
+• Point to scenario toggle: 'Conservative, Base, Optimistic — same idea as sensitivity analysis'
+• Hover a tooltip: 'All assumptions are sourced and auditable'
+• Click 'Generate Executive Summary' — let it generate
+• 'This is what a sales rep could paste into an email before a VC even gets pulled in'
+Stop there. Do not over-explain.
