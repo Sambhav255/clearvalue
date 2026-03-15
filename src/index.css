@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --chart-legacy: #9C948E;
+    --chart-everpure: #C84B0C;
+    --chart-grid: #E8E2DA;
+    --chart-tick: #6B6560;
+    --chart-axis: #E8E2DA;
+    --tooltip-bg: #FFFFFF;
+    --tooltip-border: #E8E2DA;
+    --tooltip-text: #1C1C1C;
+  }
+}

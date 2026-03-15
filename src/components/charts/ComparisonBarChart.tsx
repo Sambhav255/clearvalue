@@ -11,9 +11,6 @@ import {
 import { useResults } from '../../context/ResultsContext'
 import { formatCurrency, formatCurrencyFull } from '../../lib/formatters'
 
-const LEGACY_COLOR = '#6B7280'
-const EVERPURE_COLOR = '#F97316'
-
 export function ComparisonBarChart(): JSX.Element {
   const { results } = useResults()
 
@@ -47,24 +44,29 @@ export function ComparisonBarChart(): JSX.Element {
           data={data}
           margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="var(--chart-grid)"
+          />
           <XAxis
             dataKey="name"
-            tick={{ fill: '#94A3B8', fontSize: 12 }}
-            axisLine={{ stroke: '#475569' }}
+            tick={{ fill: 'var(--chart-tick)', fontSize: 12 }}
+            axisLine={{ stroke: 'var(--chart-axis)' }}
           />
           <YAxis
             tickFormatter={(v) => formatCurrency(v)}
-            tick={{ fill: '#94A3B8', fontSize: 12 }}
-            axisLine={{ stroke: '#475569' }}
+            tick={{ fill: 'var(--chart-tick)', fontSize: 12 }}
+            axisLine={{ stroke: 'var(--chart-axis)' }}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#1E293B',
-              border: '1px solid #475569',
+              backgroundColor: 'var(--tooltip-bg)',
+              border: '1px solid var(--tooltip-border)',
               borderRadius: '8px',
+              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+              color: 'var(--tooltip-text)',
             }}
-            labelStyle={{ color: '#F1F5F9' }}
+            labelStyle={{ color: 'var(--tooltip-text)' }}
             formatter={(value: number, name: string) => [
               formatCurrencyFull(value),
               name === 'legacy' ? 'Legacy (3yr)' : 'Everpure (3yr)',
@@ -74,7 +76,7 @@ export function ComparisonBarChart(): JSX.Element {
           <Legend
             wrapperStyle={{ paddingTop: '8px' }}
             formatter={(value) => (
-              <span className="text-slate-400 text-sm">
+              <span className="text-sm text-brand-textSecondary">
                 {value === 'legacy' ? 'Legacy (3yr)' : 'Everpure (3yr)'}
               </span>
             )}
@@ -82,13 +84,13 @@ export function ComparisonBarChart(): JSX.Element {
           <Bar
             dataKey="legacy"
             name="legacy"
-            fill={LEGACY_COLOR}
+            fill="var(--chart-legacy)"
             radius={[0, 4, 4, 0]}
           />
           <Bar
             dataKey="everpure"
             name="everpure"
-            fill={EVERPURE_COLOR}
+            fill="var(--chart-everpure)"
             radius={[0, 4, 4, 0]}
           />
         </BarChart>

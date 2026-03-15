@@ -75,7 +75,7 @@ export function DashboardScreen(): JSX.Element {
       : `${Math.round(results.paybackMonths)} mo`
 
   return (
-    <div className="min-h-screen bg-navy-900 px-6 py-8">
+    <div className="min-h-screen bg-brand-bg px-6 py-8">
       <StepIndicator />
       <div className="mx-auto max-w-6xl space-y-8">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
@@ -94,7 +94,7 @@ export function DashboardScreen(): JSX.Element {
         </div>
 
         <Card>
-          <h2 className="mb-4 text-lg font-semibold text-slate-100">
+          <h2 className="mb-4 text-lg font-semibold text-brand-navy">
             Scenario
           </h2>
           <div className="flex gap-2">
@@ -104,7 +104,7 @@ export function DashboardScreen(): JSX.Element {
                 variant={scenario === id ? 'primary' : 'secondary'}
                 size="sm"
                 onClick={() => setScenario(id)}
-              >
+                >
                 {label}
               </Button>
             ))}
@@ -112,7 +112,7 @@ export function DashboardScreen(): JSX.Element {
         </Card>
 
         <Card>
-          <h2 className="mb-4 text-lg font-semibold text-slate-100">
+          <h2 className="mb-4 text-lg font-semibold text-brand-navy">
             3-Year Total Cost Comparison
           </h2>
           <ComparisonBarChart />
@@ -123,19 +123,19 @@ export function DashboardScreen(): JSX.Element {
             <Card key={key}>
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-2">
-                  <Icon className="h-5 w-5 text-orange-500" />
-                  <span className="font-medium text-slate-100">{name}</span>
+                  <Icon className="h-5 w-5 text-brand-orange" />
+                  <span className="font-medium text-brand-text">{name}</span>
                   <Tooltip content={tooltip}>
                     <span className="inline-flex cursor-help">
-                      <Info className="h-4 w-4 text-slate-500" />
+                      <Info className="h-4 w-4 text-brand-textMuted hover:text-brand-orange" />
                     </span>
                   </Tooltip>
                 </div>
               </div>
-              <p className="mt-2 text-2xl font-semibold text-orange-500">
+              <p className="mt-2 text-2xl font-semibold text-brand-orange">
                 {formatCurrencyFull(leverSavings[key])}/yr
               </p>
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-brand-textSecondary">
                 3-year: {formatCurrencyFull(lever3yr[key])}
               </p>
             </Card>

@@ -14,17 +14,21 @@ export function KPICard({
   className = '',
 }: KPICardProps): JSX.Element {
   return (
-    <div className={`rounded-xl bg-navy-700 p-6 shadow-lg ${className}`}>
-      <p className="text-sm text-slate-400">{label}</p>
+    <div
+      className={`rounded-2xl border border-brand-cardBorder bg-brand-card p-6 shadow-sm ${className}`}
+    >
+      <p className="text-sm font-medium uppercase tracking-wide text-brand-textSecondary">
+        {label}
+      </p>
       <p
-        className={`mt-1 text-2xl font-semibold ${
-          accent ? 'text-orange-500' : 'text-slate-100'
+        className={`mt-1 font-bold ${
+          accent ? 'text-3xl text-brand-orange' : 'text-2xl text-brand-text'
         }`}
       >
         {value}
       </p>
       {subtitle != null && (
-        <p className="mt-0.5 text-xs text-slate-400">{subtitle}</p>
+        <p className="mt-0.5 text-xs text-brand-textMuted">{subtitle}</p>
       )}
     </div>
   )

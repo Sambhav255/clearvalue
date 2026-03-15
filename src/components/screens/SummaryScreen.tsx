@@ -86,24 +86,26 @@ export function SummaryScreen(): JSX.Element {
       : `${Math.round(results.paybackMonths)} mo`
 
   return (
-    <div className="min-h-screen bg-navy-900 px-6 py-8">
+    <div className="min-h-screen bg-brand-bg px-6 py-8">
       <StepIndicator />
       <div className="mx-auto max-w-6xl">
         <div className="flex gap-8">
           <div className="flex-[6] space-y-4">
-            <div className="rounded-xl bg-navy-700 p-6 shadow-lg">
-              <h1 className="text-sm font-semibold uppercase tracking-wide text-slate-400">
+            <div className="rounded-r-xl border-l-4 border-brand-orange bg-brand-orangeLight px-6 py-4">
+              <h1 className="text-sm font-semibold uppercase tracking-wide text-brand-navy">
                 Everpure Platform — Value Assessment
               </h1>
-              <p className="mt-2 text-slate-100">
+              <p className="mt-2 text-brand-text">
                 Prepared for: {inputs.companyName} | {inputs.industry} |{' '}
                 {dateStr}
               </p>
-              <p className="mt-1 text-slate-400">Scenario: {scenarioLabel}</p>
+              <p className="mt-1 text-brand-textSecondary">
+                Scenario: {scenarioLabel}
+              </p>
             </div>
 
             {status === 'idle' && (
-              <div className="flex justify-center rounded-xl bg-navy-700 p-12 shadow-lg">
+              <div className="flex justify-center rounded-2xl border border-brand-cardBorder bg-brand-card p-12 shadow-sm">
                 <Button variant="primary" size="lg" onClick={handleGenerate}>
                   Generate Executive Summary
                 </Button>
@@ -111,24 +113,24 @@ export function SummaryScreen(): JSX.Element {
             )}
 
             {status === 'loading' && (
-              <div className="rounded-xl bg-navy-700 p-8 shadow-lg">
-                <div className="h-48 animate-pulse rounded bg-navy-800" />
-                <p className="mt-4 text-center text-slate-400">
+              <div className="rounded-2xl border border-brand-cardBorder bg-brand-card p-8 shadow-sm">
+                <div className="h-48 animate-pulse rounded-xl bg-brand-inputBg" />
+                <p className="mt-4 text-center text-brand-textSecondary">
                   Analyzing your environment...
                 </p>
               </div>
             )}
 
             {status === 'generated' && (
-              <div className="rounded-xl bg-navy-700 p-6 shadow-lg">
-                <div className="whitespace-pre-wrap text-slate-100">
+              <div className="rounded-2xl border border-brand-cardBorder bg-brand-card p-6 shadow-sm">
+                <div className="whitespace-pre-wrap text-base leading-relaxed text-brand-text">
                   {generatedText}
                 </div>
                 <div className="mt-4 flex gap-2">
                   <Button variant="secondary" size="sm" onClick={handleGenerate}>
                     Regenerate
                   </Button>
-                  <Button variant="secondary" size="sm" onClick={handleCopy}>
+                  <Button variant="primary" size="sm" onClick={handleCopy}>
                     Copy to Clipboard
                   </Button>
                 </div>
@@ -136,8 +138,8 @@ export function SummaryScreen(): JSX.Element {
             )}
 
             {status === 'error' && (
-              <div className="rounded-xl bg-navy-700 p-6 shadow-lg">
-                <p className="text-slate-400">
+              <div className="rounded-2xl border border-brand-cardBorder bg-brand-card p-6 shadow-sm">
+                <p className="text-brand-textSecondary">
                   Unable to generate summary. Your financial results are still
                   valid above.
                 </p>

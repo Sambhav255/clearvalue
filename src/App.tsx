@@ -44,7 +44,7 @@ function App() {
     <Router>
       <InputProvider>
         <ResultsProvider>
-          <div className="bg-navy-900 min-h-screen text-slate-100">
+          <div className="min-h-screen bg-brand-bg font-sans text-brand-text">
             <AppRoutes />
           </div>
         </ResultsProvider>

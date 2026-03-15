@@ -7,7 +7,9 @@ interface CardProps {
 
 export function Card({ children, className = '' }: CardProps): JSX.Element {
   return (
-    <div className={`bg-navy-700 rounded-xl p-6 shadow-lg ${className}`}>
+    <div
+      className={`rounded-2xl border border-brand-cardBorder bg-brand-card p-6 shadow-sm ${className}`}
+    >
       {children}
     </div>
   )

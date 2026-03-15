@@ -32,6 +32,9 @@ const PRESET_LABELS: Record<CompanySize, string> = {
   enterprise: 'Enterprise',
 }
 
+const inputClass =
+  'mt-1 w-full rounded-xl border border-brand-border bg-brand-inputBg px-3 py-2 text-brand-text outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange'
+
 export function InputsScreen(): JSX.Element {
   const navigate = useNavigate()
   const { inputs, activePreset, updateField, applyPreset } = useInputs()
@@ -91,38 +94,40 @@ export function InputsScreen(): JSX.Element {
   )
 
   return (
-    <div className="min-h-screen bg-navy-900 px-6 py-8">
+    <div className="min-h-screen bg-brand-bg px-6 py-8">
       <StepIndicator />
       <div className="mx-auto max-w-3xl space-y-8">
         {hasErrors && (
-          <div className="rounded-xl border border-orange-500/50 bg-navy-800 px-4 py-3 text-sm text-orange-400">
+          <div className="rounded-xl border border-brand-orange bg-brand-orangeLight px-4 py-3 text-sm text-brand-text">
             Please fix the following: all required fields must be greater than
             zero and within the allowed range (Storage 1–100,000 TB; Power
             $0.01–0.50/kWh; Refresh 1–10 yr; Admins 0.1–50 FTE; Admin time 1–100%).
           </div>
         )}
-        <Card>
-          <h2 className="mb-4 text-lg font-semibold text-slate-100">
+        <Card className="p-8">
+          <h2 className="mb-6 text-lg font-semibold text-brand-navy">
             Company Profile
           </h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm text-slate-400">
+              <label className="mb-1 block text-sm font-medium uppercase tracking-wide text-brand-textSecondary">
                 Company Name
               </label>
               <input
                 type="text"
                 value={inputs.companyName}
                 onChange={(e) => updateField('companyName', e.target.value)}
-                className="mt-1 w-full rounded-lg border border-slate-600 bg-navy-800 px-3 py-2 text-slate-100"
+                className={inputClass}
               />
             </div>
             <div>
-              <label className="block text-sm text-slate-400">Industry</label>
+              <label className="mb-1 block text-sm font-medium uppercase tracking-wide text-brand-textSecondary">
+                Industry
+              </label>
               <select
                 value={inputs.industry}
                 onChange={(e) => updateField('industry', e.target.value)}
-                className="mt-1 w-full rounded-lg border border-slate-600 bg-navy-800 px-3 py-2 text-slate-100"
+                className={inputClass}
               >
                 {INDUSTRIES.map((ind) => (
                   <option key={ind} value={ind}>
@@ -132,14 +137,14 @@ export function InputsScreen(): JSX.Element {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-slate-400">
+              <label className="mb-1 block text-sm font-medium uppercase tracking-wide text-brand-textSecondary">
                 Company Size
               </label>
               <div className="mt-2 flex gap-2">
                 {(['smb', 'midmarket', 'enterprise'] as const).map((size) => (
                   <Button
                     key={size}
-                    variant={activePreset === size ? 'primary' : 'secondary'}
+                    variant={activePreset === size ? 'presetActive' : 'preset'}
                     size="sm"
                     onClick={() => applyPreset(size)}
                   >
@@ -151,17 +156,17 @@ export function InputsScreen(): JSX.Element {
           </div>
         </Card>
 
-        <Card>
-          <h2 className="mb-4 text-lg font-semibold text-slate-100">
+        <Card className="p-8">
+          <h2 className="mb-6 text-lg font-semibold text-brand-navy">
             Current Storage Environment
           </h2>
           <div className="space-y-4">
             <div>
-              <label className="flex items-center gap-1 text-sm text-slate-400">
+              <label className="mb-1 flex items-center gap-1 text-sm font-medium uppercase tracking-wide text-brand-textSecondary">
                 Total Storage (TB)
                 <Tooltip content="Total TB currently managed across all arrays">
                   <span className="inline-flex">
-                    <Info className="h-4 w-4 text-slate-500" />
+                    <Info className="h-4 w-4 text-brand-textMuted hover:text-brand-orange" />
                   </span>
                 </Tooltip>
               </label>
@@ -176,15 +181,15 @@ export function InputsScreen(): JSX.Element {
                     clamp('storageTB', Number(e.target.value) || 0)
                   )
                 }
-                className="mt-1 w-full rounded-lg border border-slate-600 bg-navy-800 px-3 py-2 text-slate-100"
+                className={inputClass}
               />
             </div>
             <div>
-              <label className="flex items-center gap-1 text-sm text-slate-400">
+              <label className="mb-1 flex items-center gap-1 text-sm font-medium uppercase tracking-wide text-brand-textSecondary">
                 Array Purchase Cost ($/TB)
                 <Tooltip content="Estimated average cost per TB of your current arrays at time of purchase">
                   <span className="inline-flex">
-                    <Info className="h-4 w-4 text-slate-500" />
+                    <Info className="h-4 w-4 text-brand-textMuted hover:text-brand-orange" />
                   </span>
                 </Tooltip>
               </label>
@@ -198,15 +203,15 @@ export function InputsScreen(): JSX.Element {
                     Number(e.target.value) || 0
                   )
                 }
-                className="mt-1 w-full rounded-lg border border-slate-600 bg-navy-800 px-3 py-2 text-slate-100"
+                className={inputClass}
               />
             </div>
             <div>
-              <label className="flex items-center gap-1 text-sm text-slate-400">
+              <label className="mb-1 flex items-center gap-1 text-sm font-medium uppercase tracking-wide text-brand-textSecondary">
                 Hardware Refresh Cycle (years)
                 <Tooltip content="How often your team replaces storage hardware. Industry average: 3–5 years.">
                   <span className="inline-flex">
-                    <Info className="h-4 w-4 text-slate-500" />
+                    <Info className="h-4 w-4 text-brand-textMuted hover:text-brand-orange" />
                   </span>
                 </Tooltip>
               </label>
@@ -221,15 +226,15 @@ export function InputsScreen(): JSX.Element {
                     clamp('refreshCycleYears', Number(e.target.value) || 0)
                   )
                 }
-                className="mt-1 w-full rounded-lg border border-slate-600 bg-navy-800 px-3 py-2 text-slate-100"
+                className={inputClass}
               />
             </div>
             <div>
-              <label className="flex items-center gap-1 text-sm text-slate-400">
+              <label className="mb-1 flex items-center gap-1 text-sm font-medium uppercase tracking-wide text-brand-textSecondary">
                 Migration Labor Cost ($)
                 <Tooltip content="Estimated labor cost for a single migration event. Includes ~3 weeks of a storage engineer's time.">
                   <span className="inline-flex">
-                    <Info className="h-4 w-4 text-slate-500" />
+                    <Info className="h-4 w-4 text-brand-textMuted hover:text-brand-orange" />
                   </span>
                 </Tooltip>
               </label>
@@ -243,23 +248,23 @@ export function InputsScreen(): JSX.Element {
                     Number(e.target.value) || 0
                   )
                 }
-                className="mt-1 w-full rounded-lg border border-slate-600 bg-navy-800 px-3 py-2 text-slate-100"
+                className={inputClass}
               />
             </div>
           </div>
         </Card>
 
-        <Card>
-          <h2 className="mb-4 text-lg font-semibold text-slate-100">
+        <Card className="p-8">
+          <h2 className="mb-6 text-lg font-semibold text-brand-navy">
             Operational Inputs
           </h2>
           <div className="space-y-4">
             <div>
-              <label className="flex items-center gap-1 text-sm text-slate-400">
+              <label className="mb-1 flex items-center gap-1 text-sm font-medium uppercase tracking-wide text-brand-textSecondary">
                 Power Cost ($/kWh)
                 <Tooltip content="Your data center's blended electricity rate. US data center average: $0.07–0.12.">
                   <span className="inline-flex">
-                    <Info className="h-4 w-4 text-slate-500" />
+                    <Info className="h-4 w-4 text-brand-textMuted hover:text-brand-orange" />
                   </span>
                 </Tooltip>
               </label>
@@ -275,15 +280,15 @@ export function InputsScreen(): JSX.Element {
                     clamp('kwhRate', Number(e.target.value) || 0)
                   )
                 }
-                className="mt-1 w-full rounded-lg border border-slate-600 bg-navy-800 px-3 py-2 text-slate-100"
+                className={inputClass}
               />
             </div>
             <div>
-              <label className="flex items-center gap-1 text-sm text-slate-400">
+              <label className="mb-1 flex items-center gap-1 text-sm font-medium uppercase tracking-wide text-brand-textSecondary">
                 Storage Admins (FTE)
                 <Tooltip content="Full-time equivalents whose primary responsibility includes storage management.">
                   <span className="inline-flex">
-                    <Info className="h-4 w-4 text-slate-500" />
+                    <Info className="h-4 w-4 text-brand-textMuted hover:text-brand-orange" />
                   </span>
                 </Tooltip>
               </label>
@@ -299,15 +304,15 @@ export function InputsScreen(): JSX.Element {
                     clamp('adminFTEs', Number(e.target.value) || 0)
                   )
                 }
-                className="mt-1 w-full rounded-lg border border-slate-600 bg-navy-800 px-3 py-2 text-slate-100"
+                className={inputClass}
               />
             </div>
             <div>
-              <label className="flex items-center gap-1 text-sm text-slate-400">
+              <label className="mb-1 flex items-center gap-1 text-sm font-medium uppercase tracking-wide text-brand-textSecondary">
                 Admin Fully-Loaded Cost ($/yr)
                 <Tooltip content="Total cost including salary, benefits, and overhead. US storage admin average: $110–140k.">
                   <span className="inline-flex">
-                    <Info className="h-4 w-4 text-slate-500" />
+                    <Info className="h-4 w-4 text-brand-textMuted hover:text-brand-orange" />
                   </span>
                 </Tooltip>
               </label>
@@ -321,15 +326,15 @@ export function InputsScreen(): JSX.Element {
                     Number(e.target.value) || 0
                   )
                 }
-                className="mt-1 w-full rounded-lg border border-slate-600 bg-navy-800 px-3 py-2 text-slate-100"
+                className={inputClass}
               />
             </div>
             <div>
-              <label className="flex items-center gap-1 text-sm text-slate-400">
+              <label className="mb-1 flex items-center gap-1 text-sm font-medium uppercase tracking-wide text-brand-textSecondary">
                 Admin % Time on Storage
                 <Tooltip content="Percentage of each admin's time spent on storage-related tasks.">
                   <span className="inline-flex">
-                    <Info className="h-4 w-4 text-slate-500" />
+                    <Info className="h-4 w-4 text-brand-textMuted hover:text-brand-orange" />
                   </span>
                 </Tooltip>
               </label>
@@ -348,9 +353,9 @@ export function InputsScreen(): JSX.Element {
                       clamp('adminTimePct', Number(e.target.value))
                     )
                   }
-                  className="flex-1"
+                  className="flex-1 accent-brand"
                 />
-                <span className="w-12 text-slate-100">
+                <span className="w-12 text-brand-text">
                   {Math.min(
                     Math.max(inputs.adminTimePct ?? 60, CLAMP.adminTimePct.min),
                     CLAMP.adminTimePct.max
@@ -359,11 +364,11 @@ export function InputsScreen(): JSX.Element {
               </div>
             </div>
             <div>
-              <label className="flex items-center gap-1 text-sm text-slate-400">
+              <label className="mb-1 flex items-center gap-1 text-sm font-medium uppercase tracking-wide text-brand-textSecondary">
                 Downtime Cost ($/hr)
                 <Tooltip content="Business cost of one hour of storage-related downtime. Includes lost revenue, SLA penalties, and recovery labor.">
                   <span className="inline-flex">
-                    <Info className="h-4 w-4 text-slate-500" />
+                    <Info className="h-4 w-4 text-brand-textMuted hover:text-brand-orange" />
                   </span>
                 </Tooltip>
               </label>
@@ -377,18 +382,19 @@ export function InputsScreen(): JSX.Element {
                     Number(e.target.value) || 0
                   )
                 }
-                className="mt-1 w-full rounded-lg border border-slate-600 bg-navy-800 px-3 py-2 text-slate-100"
+                className={inputClass}
               />
             </div>
           </div>
         </Card>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end max-sm:w-full">
           <Button
             variant="primary"
             size="lg"
             disabled={inputs.storageTB === 0}
             onClick={handleCalculate}
+            className="w-full max-sm:max-w-none sm:w-auto"
           >
             Calculate Value →
           </Button>

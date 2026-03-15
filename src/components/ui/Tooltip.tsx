@@ -14,7 +14,7 @@ export function Tooltip({ content, children }: TooltipProps): JSX.Element {
           <span
             role="button"
             tabIndex={0}
-            className="inline-flex cursor-help border-0 bg-transparent p-0 [&:focus]:outline-none [&:focus-visible]:ring-2 [&:focus-visible]:ring-orange-500 [&:focus-visible]:ring-offset-2 [&:focus-visible]:ring-offset-navy-900"
+            className="inline-flex cursor-help border-0 bg-transparent p-0 text-brand-textMuted hover:text-brand-orange [&:focus]:outline-none [&:focus-visible]:ring-2 [&:focus-visible]:ring-brand-orange [&:focus-visible]:ring-offset-2 [&:focus-visible]:ring-offset-brand-bg"
           >
             {children}
           </span>
@@ -22,7 +22,7 @@ export function Tooltip({ content, children }: TooltipProps): JSX.Element {
         <TooltipPrimitive.TooltipPortal>
           <TooltipPrimitive.TooltipContent
             sideOffset={4}
-            className="max-w-xs rounded bg-navy-800 px-2 py-1 text-xs text-slate-100 shadow-lg"
+            className="max-w-xs rounded-lg bg-brand-navy px-3 py-2 text-xs text-white"
           >
             {content}
           </TooltipPrimitive.TooltipContent>

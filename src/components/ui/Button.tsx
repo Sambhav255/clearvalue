@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost'
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'preset' | 'presetActive'
 type ButtonSize = 'sm' | 'md' | 'lg'
 
 interface ButtonProps {
@@ -14,15 +14,22 @@ interface ButtonProps {
 }
 
 const sizeClasses: Record<ButtonSize, string> = {
-  sm: 'px-3 py-1.5 text-sm',
-  md: 'px-4 py-2 text-base',
+  sm: 'px-5 py-2 text-sm',
+  md: 'px-6 py-3 text-base',
   lg: 'px-6 py-3 text-lg',
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-orange-500 hover:bg-orange-400 text-white transition-colors duration-200',
-  secondary: 'border border-slate-400 text-slate-100 hover:border-slate-300 transition-colors duration-200',
-  ghost: 'text-slate-400 hover:text-slate-100 transition-colors duration-200',
+  primary:
+    'bg-brand-orange hover:bg-brand-orangeHover text-white font-semibold rounded-xl transition-colors duration-200',
+  secondary:
+    'border border-brand-border text-brand-textSecondary hover:border-brand-orange hover:text-brand-orange rounded-xl transition-colors duration-200',
+  ghost:
+    'border border-brand-border text-brand-textSecondary hover:border-brand-orange hover:text-brand-orange rounded-xl transition-colors duration-200',
+  preset:
+    'bg-white border border-brand-border text-brand-text rounded-xl font-medium transition-colors duration-200',
+  presetActive:
+    'bg-brand-orangeLight border border-brand-orange text-brand-orange font-semibold rounded-xl transition-colors duration-200',
 }
 
 export function Button({
@@ -39,7 +46,7 @@ export function Button({
       type={type}
       disabled={disabled}
       onClick={onClick}
-      className={`rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      className={`${variantClasses[variant]} ${sizeClasses[size]} disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
     >
       {children}
     </button>
