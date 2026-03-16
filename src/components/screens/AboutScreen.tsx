@@ -185,19 +185,19 @@ export function AboutScreen(): JSX.Element {
 function WhyTab(): JSX.Element {
   const cards = [
     {
-      title: 'The Associate Value Consultant Role',
+      title: 'I read the job description differently',
       body:
-        "The core job is translating complex infrastructure decisions into defensible financial narratives. One line in the job description stood out, 'Optimize our library of reusable benchmarks and modeling templates.' That told me the team thinks about scaling value conversations, not just executing them one at a time.",
+        "Most people read 'Optimize our library of reusable benchmarks and modeling templates' as a task. I read it as a product problem. The GVM team is not just executing value conversations, they are trying to scale them. That is a different challenge, and it is one I actually know how to think about.",
     },
     {
-      title: 'What I Noticed',
+      title: 'So I stress-tested my own understanding',
       body:
-        'Value conversations happen reactively. A VC gets pulled in weeks into a deal and the economic case justifies a decision rather than shaping one. The first discovery call is where the narrative should start.',
+        "The fastest way to find out if you understand something is to build it. I spent a weekend modeling Everpure's four core value levers from primary sources including ESG studies, Everpure's own SLA documentation, ITIC downtime benchmarks, and BLS labor data. If my assumptions were wrong, the model would tell me. That process taught me more about this role than any prep document could.",
     },
     {
-      title: 'So I Built ClearValue',
+      title: 'The gap I kept coming back to',
       body:
-        'ClearValue models the four core value levers Everpure delivers and outputs a CFO-ready business case in under 3 minutes. The AI executive summary is what a sales rep could send before a Value Consultant is ever involved.',
+        "A Value Consultant gets pulled into a deal weeks after it is already in motion. The economic case justifies a decision rather than shaping one. The first discovery call is where the narrative should start, and a sales rep in that conversation needs a tool that gives them financial credibility before a VC is ever involved. ClearValue is a prototype of that tool.",
     },
   ]
   return (
@@ -211,6 +211,9 @@ function WhyTab(): JSX.Element {
           <p className="mt-3 leading-relaxed text-brand-text">{body}</p>
         </div>
       ))}
+      <p className="mt-4 text-center text-sm text-brand-textMuted">
+        I am not pitching this as production ready. I am sharing it because building it is how I show up when something matters to me.
+      </p>
     </div>
   )
 }
@@ -221,13 +224,13 @@ function ProblemTab(): JSX.Element {
       num: '01',
       title: 'Value conversations happen too late',
       body:
-        'By the time a Value Consultant is pulled in, the customer is already deep in vendor evaluation. The economic case justifies a decision rather than shaping one.',
+        "By the time a Value Consultant is pulled in, the customer is already deep in vendor evaluation. By the time they're involved, the economic case is justifying a decision rather than shaping one.",
     },
     {
       num: '02',
       title: 'Benchmark libraries go stale',
       body:
-        'Every new product launch makes existing assumptions outdated and someone has to manually update them. A tool with configurable, sourced assumptions solves this at scale.',
+        'Every new product launch makes existing assumptions outdated. Someone has to manually hunt down new benchmarks and update the models. A tool with configurable, sourced assumptions solves this systematically.',
     },
     {
       num: '03',
@@ -237,9 +240,9 @@ function ProblemTab(): JSX.Element {
     },
     {
       num: '04',
-      title: 'Executive summaries take too long',
+      title: 'Executive summaries are rebuilt from scratch every time',
       body:
-        'Every customer gets a different business case but the narrative structure is always the same. One click should produce a personalized CFO-ready memo using the customer\u2019s actual numbers.',
+        "The narrative structure of a CFO memo is always the same. Only the numbers change. That's exactly the kind of repetitive, high-stakes work that should be automated.",
     },
   ]
   return (
