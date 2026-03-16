@@ -9,33 +9,46 @@ import {
   YAxis,
 } from 'recharts'
 import { useResults } from '../../context/ResultsContext'
+import { useSettings } from '../../context/SettingsContext'
 import { formatCurrency, formatCurrencyFull } from '../../lib/formatters'
 
-export function ComparisonBarChart(): JSX.Element {
-  const { results } = useResults()
+type ChartViewMode = 'annual' | '3yr'
 
+interface ComparisonBarChartProps {
+  viewMode?: ChartViewMode
+}
+
+export function ComparisonBarChart({
+  viewMode = '3yr',
+}: ComparisonBarChartProps): JSX.Element {
+  const { results } = useResults()
+  const { currency } = useSettings()
+
+  const divisor = viewMode === 'annual' ? 3 : 1
   const data = [
     {
       name: 'Power/Cooling',
-      legacy: results.legacy3yrPower,
-      everpure: results.everpure3yrPower,
+      legacy: results.legacy3yrPower / divisor,
+      everpure: results.everpure3yrPower / divisor,
     },
     {
       name: 'Refresh Avoidance',
-      legacy: results.legacy3yrRefresh,
-      everpure: results.everpure3yrRefresh,
+      legacy: results.legacy3yrRefresh / divisor,
+      everpure: results.everpure3yrRefresh / divisor,
     },
     {
       name: 'Admin Labor',
-      legacy: results.legacy3yrAdmin,
-      everpure: results.everpure3yrAdmin,
+      legacy: results.legacy3yrAdmin / divisor,
+      everpure: results.everpure3yrAdmin / divisor,
     },
     {
       name: 'Downtime Risk',
-      legacy: results.legacy3yrDowntime,
-      everpure: results.everpure3yrDowntime,
+      legacy: results.legacy3yrDowntime / divisor,
+      everpure: results.everpure3yrDowntime / divisor,
     },
   ]
+
+  const suffix = viewMode === 'annual' ? ' (yr)' : ' (3yr)'
 
   return (
     <div className="h-80 w-full">
@@ -54,7 +67,7 @@ export function ComparisonBarChart(): JSX.Element {
             axisLine={{ stroke: 'var(--chart-axis)' }}
           />
           <YAxis
-            tickFormatter={(v) => formatCurrency(v)}
+            tickFormatter={(v) => formatCurrency(v, currency)}
             tick={{ fill: 'var(--chart-tick)', fontSize: 12 }}
             axisLine={{ stroke: 'var(--chart-axis)' }}
           />
@@ -63,13 +76,13 @@ export function ComparisonBarChart(): JSX.Element {
               backgroundColor: 'var(--tooltip-bg)',
               border: '1px solid var(--tooltip-border)',
               borderRadius: '8px',
-              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.3)',
               color: 'var(--tooltip-text)',
             }}
             labelStyle={{ color: 'var(--tooltip-text)' }}
             formatter={(value: number, name: string) => [
-              formatCurrencyFull(value),
-              name === 'legacy' ? 'Legacy (3yr)' : 'Everpure (3yr)',
+              formatCurrencyFull(value, currency),
+              name === 'legacy' ? `Legacy${suffix}` : `Everpure${suffix}`,
             ]}
             labelFormatter={(label) => `${label}`}
           />
@@ -77,7 +90,7 @@ export function ComparisonBarChart(): JSX.Element {
             wrapperStyle={{ paddingTop: '8px' }}
             formatter={(value) => (
               <span className="text-sm text-brand-textSecondary">
-                {value === 'legacy' ? 'Legacy (3yr)' : 'Everpure (3yr)'}
+                {value === 'legacy' ? `Legacy${suffix}` : `Everpure${suffix}`}
               </span>
             )}
           />

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { cn } from '../../lib/utils'
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'preset' | 'presetActive'
 type ButtonSize = 'sm' | 'md' | 'lg'
@@ -46,7 +47,12 @@ export function Button({
       type={type}
       disabled={disabled}
       onClick={onClick}
-      className={`${variantClasses[variant]} ${sizeClasses[size]} disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      className={cn(
+        variantClasses[variant],
+        sizeClasses[size],
+        'disabled:opacity-50 disabled:cursor-not-allowed',
+        className
+      )}
     >
       {children}
     </button>

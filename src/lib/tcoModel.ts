@@ -13,17 +13,24 @@ const LEVER_NAMES = {
   downtimeSavings: 'Downtime Risk Mitigation',
 } as const
 
+const LEGACY_WATTS_PER_TB = 2.85
+const EVERPURE_WATTS_PER_TB = 0.11
+const PUE_MULTIPLIER = 1.56
+const REFRESH_HARDWARE_COST_PCT = 2.0
+const LEGACY_DOWNTIME_HOURS = 0.876
+const EVERPURE_DOWNTIME_HOURS = 0.00876
+
 function calculatePowerSavings(inputs: UserInputs): number {
   const legacyPowerCost =
-    (inputs.storageTB * 22.5 * 8760 * inputs.kwhRate * 1.4) / 1000
+    (inputs.storageTB * LEGACY_WATTS_PER_TB * 8760 * inputs.kwhRate * PUE_MULTIPLIER) / 1000
   const everpurePowerCost =
-    (inputs.storageTB * 2.5 * 8760 * inputs.kwhRate * 1.4) / 1000
+    (inputs.storageTB * EVERPURE_WATTS_PER_TB * 8760 * inputs.kwhRate * PUE_MULTIPLIER) / 1000
   return legacyPowerCost - everpurePowerCost
 }
 
 function calculateRefreshSavings(inputs: UserInputs): number {
   const refreshCostPerCycle =
-    inputs.arrayPricePerTB * inputs.storageTB * 0.8 + inputs.migrationLaborCost
+    inputs.arrayPricePerTB * inputs.storageTB * REFRESH_HARDWARE_COST_PCT + inputs.migrationLaborCost
   return refreshCostPerCycle / inputs.refreshCycleYears
 }
 
@@ -36,10 +43,8 @@ function calculateAdminSavings(inputs: UserInputs): number {
 }
 
 function calculateDowntimeSavings(inputs: UserInputs): number {
-  const legacyDowntimeHours = 4.38
-  const everpureDowntimeHours = 0.0526
   return (
-    (legacyDowntimeHours - everpureDowntimeHours) * inputs.downtimeCostPerHour
+    (LEGACY_DOWNTIME_HOURS - EVERPURE_DOWNTIME_HOURS) * inputs.downtimeCostPerHour
   )
 }
 
@@ -57,8 +62,9 @@ export default function calculateTCO(
   const mult = SCENARIO_MULTIPLIER[scenario]
   const totalSavings3yr = annualSavings * 3 * mult
 
-  const legacyArrayCost = inputs.arrayPricePerTB * inputs.storageTB
-  const everpurePremium = legacyArrayCost * 0.25
+  // Everpure premium is modeled as the total Everpure investment,
+  // using an estimated Everpure price per TB.
+  const everpurePremium = inputs.storageTB * inputs.everpurePricePerTB
 
   const npv =
     (annualSavings * mult) / 1.08 +
@@ -92,11 +98,11 @@ export default function calculateTCO(
   }
 
   const legacyPowerCost =
-    (inputs.storageTB * 22.5 * 8760 * inputs.kwhRate * 1.4) / 1000
+    (inputs.storageTB * LEGACY_WATTS_PER_TB * 8760 * inputs.kwhRate * PUE_MULTIPLIER) / 1000
   const everpurePowerCost =
-    (inputs.storageTB * 2.5 * 8760 * inputs.kwhRate * 1.4) / 1000
+    (inputs.storageTB * EVERPURE_WATTS_PER_TB * 8760 * inputs.kwhRate * PUE_MULTIPLIER) / 1000
   const annualRefreshCost =
-    (inputs.arrayPricePerTB * inputs.storageTB * 0.8 + inputs.migrationLaborCost) /
+    (inputs.arrayPricePerTB * inputs.storageTB * REFRESH_HARDWARE_COST_PCT + inputs.migrationLaborCost) /
     inputs.refreshCycleYears
   const currentAdminCost =
     inputs.adminFTEs *
@@ -124,7 +130,7 @@ export default function calculateTCO(
     everpure3yrRefresh: 0,
     legacy3yrAdmin: currentAdminCost * 3,
     everpure3yrAdmin: currentAdminCost * 0.68 * 3,
-    legacy3yrDowntime: 4.38 * inputs.downtimeCostPerHour * 3,
-    everpure3yrDowntime: 0.0526 * inputs.downtimeCostPerHour * 3,
+    legacy3yrDowntime: LEGACY_DOWNTIME_HOURS * inputs.downtimeCostPerHour * 3,
+    everpure3yrDowntime: EVERPURE_DOWNTIME_HOURS * inputs.downtimeCostPerHour * 3,
   }
 }

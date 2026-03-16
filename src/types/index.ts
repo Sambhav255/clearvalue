@@ -1,11 +1,13 @@
 export type ScenarioType = 'conservative' | 'base' | 'optimistic'
 export type CompanySize = 'smb' | 'midmarket' | 'enterprise'
+export type CurrencyCode = 'USD' | 'EUR' | 'GBP'
 
 export interface UserInputs {
   companyName: string
   industry: string
   storageTB: number
   arrayPricePerTB: number
+  everpurePricePerTB: number
   refreshCycleYears: number
   migrationLaborCost: number
   kwhRate: number

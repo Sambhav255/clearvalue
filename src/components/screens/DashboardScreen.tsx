@@ -1,12 +1,16 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
 import { KPICard } from '../ui/KPICard'
 import { Tooltip } from '../ui/Tooltip'
-import { StepIndicator } from '../ui/StepIndicator'
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover'
 import { ComparisonBarChart } from '../charts/ComparisonBarChart'
+import { SavingsOverTimeChart } from '../charts/SavingsOverTimeChart'
 import { useResults } from '../../context/ResultsContext'
+import { useSettings } from '../../context/SettingsContext'
 import { formatCurrencyFull } from '../../lib/formatters'
+import { KPI_TOOLTIPS, LEVER_METADATA } from '../../lib/leverMetadata'
 import type { ScenarioType } from '../../types'
 import {
   Zap,
@@ -22,41 +26,43 @@ const SCENARIOS: { id: ScenarioType; label: string }[] = [
   { id: 'optimistic', label: 'Optimistic' },
 ]
 
+type ChartViewMode = 'annual' | '3yr'
+
 const LEVER_CONFIG = [
   {
     key: 'power' as const,
     name: 'Power & Cooling Savings',
     icon: Zap,
-    tooltip:
-      "Based on Everpure's published 10x power efficiency advantage over legacy disk/hybrid arrays. Legacy average: ~25W/TB. Everpure average: ~2.5W/TB. Cooling multiplier of 1.4x is the industry standard PUE delta.",
+    meta: LEVER_METADATA.power,
   },
   {
     key: 'refresh' as const,
     name: 'Refresh & Migration Avoidance',
     icon: RefreshCw,
-    tooltip:
-      "Legacy arrays require a hardware refresh every 3–5 years, typically costing 80% of the original purchase price plus 2–4 weeks of migration labor. Everpure's Evergreen subscription eliminates this cost entirely.",
+    meta: LEVER_METADATA.refresh,
   },
   {
     key: 'admin' as const,
     name: 'Admin Labor Reduction',
     icon: Users,
-    tooltip:
-      "ESG's independent validation of Everpure's Pure1 platform found a 32% reduction in storage administration labor. Source: ESG Economic Validation, 2024.",
+    meta: LEVER_METADATA.admin,
   },
   {
     key: 'downtime' as const,
     name: 'Downtime Risk Mitigation',
     icon: ShieldAlert,
-    tooltip:
-      "Based on availability delta: Legacy 99.99% = 4.38 hrs downtime/yr. Everpure 99.9999% = 0.053 hrs/yr. Difference × customer's hourly downtime cost.",
+    meta: LEVER_METADATA.downtime,
   },
 ]
 
 export function DashboardScreen(): JSX.Element {
   const navigate = useNavigate()
+  const { currency } = useSettings()
   const { results, scenario, setScenario } = useResults()
+  const [chartViewMode, setChartViewMode] = useState<ChartViewMode>('3yr')
 
+  const scenarioMult =
+    scenario === 'conservative' ? 0.6 : scenario === 'optimistic' ? 1.25 : 1
   const leverSavings = {
     power: results.powerSavings,
     refresh: results.refreshSavings,
@@ -64,11 +70,17 @@ export function DashboardScreen(): JSX.Element {
     downtime: results.downtimeSavings,
   }
   const lever3yr = {
-    power: results.powerSavings * 3 * (scenario === 'conservative' ? 0.6 : scenario === 'optimistic' ? 1.25 : 1),
-    refresh: results.refreshSavings * 3 * (scenario === 'conservative' ? 0.6 : scenario === 'optimistic' ? 1.25 : 1),
-    admin: results.adminSavings * 3 * (scenario === 'conservative' ? 0.6 : scenario === 'optimistic' ? 1.25 : 1),
-    downtime: results.downtimeSavings * 3 * (scenario === 'conservative' ? 0.6 : scenario === 'optimistic' ? 1.25 : 1),
+    power: results.powerSavings * 3 * scenarioMult,
+    refresh: results.refreshSavings * 3 * scenarioMult,
+    admin: results.adminSavings * 3 * scenarioMult,
+    downtime: results.downtimeSavings * 3 * scenarioMult,
   }
+  const totalSavingsLabel =
+    chartViewMode === '3yr' ? 'Total 3-Year Savings' : 'Total Annual Savings'
+  const totalSavingsValue =
+    chartViewMode === '3yr'
+      ? results.totalSavings3yr
+      : results.annualSavings * scenarioMult
   const paybackDisplay =
     results.paybackMonths === Infinity || !Number.isFinite(results.paybackMonths)
       ? 'N/A'
@@ -76,21 +88,54 @@ export function DashboardScreen(): JSX.Element {
 
   return (
     <div className="min-h-screen bg-brand-bg px-6 py-8">
-      <StepIndicator />
       <div className="mx-auto max-w-6xl space-y-8">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
           <KPICard
-            label="Total 3-Year Savings"
-            value={formatCurrencyFull(results.totalSavings3yr)}
+            label={totalSavingsLabel}
+            value={formatCurrencyFull(totalSavingsValue, currency)}
             accent
+            tooltipContent={
+              <Tooltip content={KPI_TOOLTIPS.totalSavings3yr}>
+                <span className="inline-flex cursor-help">
+                  <Info className="h-4 w-4 text-brand-textMuted hover:text-brand-orange" />
+                </span>
+              </Tooltip>
+            }
           />
           <KPICard
             label="NPV (8% discount rate)"
-            value={formatCurrencyFull(results.npv)}
+            value={formatCurrencyFull(results.npv, currency)}
             accent
+            tooltipContent={
+              <Tooltip content={KPI_TOOLTIPS.npv}>
+                <span className="inline-flex cursor-help">
+                  <Info className="h-4 w-4 text-brand-textMuted hover:text-brand-orange" />
+                </span>
+              </Tooltip>
+            }
           />
-          <KPICard label="Payback Period" value={paybackDisplay} />
-          <KPICard label="ROI" value={`${results.roi.toFixed(1)}%`} />
+          <KPICard
+            label="Payback Period"
+            value={paybackDisplay}
+            tooltipContent={
+              <Tooltip content={KPI_TOOLTIPS.paybackPeriod}>
+                <span className="inline-flex cursor-help">
+                  <Info className="h-4 w-4 text-brand-textMuted hover:text-brand-orange" />
+                </span>
+              </Tooltip>
+            }
+          />
+          <KPICard
+            label="ROI"
+            value={`${results.roi.toFixed(1)}%`}
+            tooltipContent={
+              <Tooltip content={KPI_TOOLTIPS.roi}>
+                <span className="inline-flex cursor-help">
+                  <Info className="h-4 w-4 text-brand-textMuted hover:text-brand-orange" />
+                </span>
+              </Tooltip>
+            }
+          />
         </div>
 
         <Card>
@@ -104,7 +149,7 @@ export function DashboardScreen(): JSX.Element {
                 variant={scenario === id ? 'primary' : 'secondary'}
                 size="sm"
                 onClick={() => setScenario(id)}
-                >
+              >
                 {label}
               </Button>
             ))}
@@ -112,31 +157,72 @@ export function DashboardScreen(): JSX.Element {
         </Card>
 
         <Card>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-lg font-semibold text-brand-navy">
+              {chartViewMode === '3yr'
+                ? '3-Year Total Cost Comparison'
+                : 'Annual Cost Comparison'}
+            </h2>
+            <div className="flex gap-2">
+              <Button
+                variant={chartViewMode === 'annual' ? 'primary' : 'secondary'}
+                size="sm"
+                onClick={() => setChartViewMode('annual')}
+              >
+                Annual
+              </Button>
+              <Button
+                variant={chartViewMode === '3yr' ? 'primary' : 'secondary'}
+                size="sm"
+                onClick={() => setChartViewMode('3yr')}
+              >
+                3-Year Total
+              </Button>
+            </div>
+          </div>
+          <ComparisonBarChart viewMode={chartViewMode} />
+        </Card>
+
+        <Card>
           <h2 className="mb-4 text-lg font-semibold text-brand-navy">
-            3-Year Total Cost Comparison
+            Savings Over Time (Payback)
           </h2>
-          <ComparisonBarChart />
+          <SavingsOverTimeChart />
         </Card>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {LEVER_CONFIG.map(({ key, name, icon: Icon, tooltip }) => (
+          {LEVER_CONFIG.map(({ key, name, icon: Icon, meta }) => (
             <Card key={key}>
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-2">
                   <Icon className="h-5 w-5 text-brand-orange" />
                   <span className="font-medium text-brand-text">{name}</span>
-                  <Tooltip content={tooltip}>
-                    <span className="inline-flex cursor-help">
-                      <Info className="h-4 w-4 text-brand-textMuted hover:text-brand-orange" />
-                    </span>
-                  </Tooltip>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <span className="inline-flex cursor-help">
+                        <Info className="h-4 w-4 text-brand-textMuted hover:text-brand-orange" />
+                      </span>
+                    </PopoverTrigger>
+                    <PopoverContent className="max-w-md">
+                      <p className="font-medium text-brand-text">{meta.name}</p>
+                      <p className="mt-2 font-mono text-xs text-brand-textSecondary">
+                        {meta.formula}
+                      </p>
+                      <p className="mt-2 text-brand-textSecondary">
+                        {meta.source}
+                      </p>
+                      <p className="mt-2 text-xs text-brand-textMuted">
+                        Source: {meta.sourceCitation}
+                      </p>
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div>
               <p className="mt-2 text-2xl font-semibold text-brand-orange">
-                {formatCurrencyFull(leverSavings[key])}/yr
+                {formatCurrencyFull(leverSavings[key], currency)}/yr
               </p>
               <p className="text-sm text-brand-textSecondary">
-                3-year: {formatCurrencyFull(lever3yr[key])}
+                3-year: {formatCurrencyFull(lever3yr[key], currency)}
               </p>
             </Card>
           ))}
@@ -146,10 +232,7 @@ export function DashboardScreen(): JSX.Element {
           <Button variant="secondary" onClick={() => navigate('/inputs')}>
             ← Edit Inputs
           </Button>
-          <Button
-            variant="primary"
-            onClick={() => navigate('/summary')}
-          >
+          <Button variant="primary" onClick={() => navigate('/summary')}>
             Generate Executive Summary →
           </Button>
         </div>

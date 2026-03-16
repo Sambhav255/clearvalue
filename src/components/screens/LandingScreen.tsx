@@ -81,7 +81,15 @@ export function LandingScreen(): JSX.Element {
         </div>
       </main>
       <footer className="relative py-6 text-center text-sm text-brand-textMuted">
-        Built by Sambhav Lamichhane
+        Built by Sambhav Lamichhane{' '}
+        <a
+          href="https://clearvalue.vercel.app"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-brand-textMuted hover:text-brand-orange"
+        >
+          · clearvalue.vercel.app
+        </a>
       </footer>
     </div>
   )

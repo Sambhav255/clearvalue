@@ -3,6 +3,18 @@ import calculateTCO from '../lib/tcoModel'
 import type { ScenarioType, TCOResults } from '../types'
 import { useInputs } from './InputContext'
 
+const STORAGE_KEY_SCENARIO = 'clearvalue_scenario'
+
+function loadStoredScenario(): ScenarioType {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_SCENARIO)
+    if (raw === 'conservative' || raw === 'base' || raw === 'optimistic') return raw
+  } catch {
+    // ignore
+  }
+  return 'base'
+}
+
 interface ResultsContextValue {
   results: TCOResults
   scenario: ScenarioType
@@ -13,10 +25,15 @@ const ResultsContext = createContext<ResultsContextValue | null>(null)
 
 export function ResultsProvider({ children }: { children: ReactNode }) {
   const { inputs } = useInputs()
-  const [scenario, setScenarioState] = useState<ScenarioType>('base')
+  const [scenario, setScenarioState] = useState<ScenarioType>(loadStoredScenario)
 
   const setScenario = useCallback((s: ScenarioType) => {
     setScenarioState(s)
+    try {
+      localStorage.setItem(STORAGE_KEY_SCENARIO, s)
+    } catch {
+      // ignore
+    }
   }, [])
 
   const results = useMemo(

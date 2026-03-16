@@ -2,6 +2,9 @@ import type { ReactNode } from 'react'
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 import { InputProvider, useInputs } from './context/InputContext'
 import { ResultsProvider } from './context/ResultsContext'
+import { SettingsProvider } from './context/SettingsContext'
+import { AppHeader } from './components/AppHeader'
+import { AboutScreen } from './components/screens/AboutScreen'
 import { DashboardScreen } from './components/screens/DashboardScreen'
 import { InputsScreen } from './components/screens/InputsScreen'
 import { LandingScreen } from './components/screens/LandingScreen'
@@ -17,6 +20,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<LandingScreen />} />
+      <Route path="/about" element={<AboutScreen />} />
       <Route path="/inputs" element={<InputsScreen />} />
       <Route
         path="/dashboard"
@@ -42,13 +46,16 @@ function AppRoutes() {
 function App() {
   return (
     <Router>
-      <InputProvider>
-        <ResultsProvider>
-          <div className="min-h-screen bg-brand-bg font-sans text-brand-text">
-            <AppRoutes />
-          </div>
-        </ResultsProvider>
-      </InputProvider>
+      <SettingsProvider>
+        <InputProvider>
+          <ResultsProvider>
+            <div className="min-h-screen bg-brand-bg font-sans text-brand-text">
+              <AppHeader />
+              <AppRoutes />
+            </div>
+          </ResultsProvider>
+        </InputProvider>
+      </SettingsProvider>
     </Router>
   )
 }

@@ -2,11 +2,12 @@ import { useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../ui/Button'
 import { KPICard } from '../ui/KPICard'
-import { StepIndicator } from '../ui/StepIndicator'
 import { useInputs } from '../../context/InputContext'
 import { useResults } from '../../context/ResultsContext'
-import { generateExecutiveSummary, type SummaryParams } from '../../lib/geminiApi'
+import { useSettings } from '../../context/SettingsContext'
+import { generateExecutiveSummary, SummaryGenerationError, type SummaryParams } from '../../lib/geminiApi'
 import { formatCurrencyFull } from '../../lib/formatters'
+import { downloadPDFReport } from '../../lib/pdfExport'
 import type { CompanySize } from '../../types'
 
 const COMPANY_SIZE_LABEL: Record<CompanySize, string> = {
@@ -21,8 +22,10 @@ export function SummaryScreen(): JSX.Element {
   const navigate = useNavigate()
   const { inputs, activePreset, applyPreset } = useInputs()
   const { results, scenario } = useResults()
+  const { currency } = useSettings()
   const [status, setStatus] = useState<SummaryStatus>('idle')
   const [generatedText, setGeneratedText] = useState('')
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const scenarioLabel =
     scenario === 'conservative'
@@ -41,6 +44,7 @@ export function SummaryScreen(): JSX.Element {
 
   const handleGenerate = useCallback(async () => {
     setStatus('loading')
+    setErrorMessage(null)
     const params: SummaryParams = {
       companyName: inputs.companyName,
       industry: inputs.industry,
@@ -61,8 +65,22 @@ export function SummaryScreen(): JSX.Element {
       const text = await generateExecutiveSummary(params)
       setGeneratedText(text)
       setStatus('generated')
-    } catch {
+    } catch (err) {
       setStatus('error')
+      const raw =
+        err instanceof SummaryGenerationError
+          ? err.userMessage
+          : err instanceof Error
+            ? err.message
+            : 'Something went wrong. Try again.'
+      // #region agent log
+      fetch('http://127.0.0.1:7549/ingest/3333e265-2fd7-4b40-a746-6557a6836ef1',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'4d3b58'},body:JSON.stringify({sessionId:'4d3b58',location:'SummaryScreen.tsx:catch',message:'caught error',data:{raw,errName:err instanceof Error?err.name:'',isSummaryErr:err instanceof SummaryGenerationError},timestamp:Date.now(),hypothesisId:'E'})}).catch(()=>{});
+      // #endregion
+      const friendly =
+        raw === 'Failed to fetch'
+          ? 'Cannot reach the API. Check your connection and try again.'
+          : raw
+      setErrorMessage(friendly)
     }
   }, [inputs, results, scenario, companySizeLabel])
 
@@ -74,6 +92,18 @@ export function SummaryScreen(): JSX.Element {
       // Clipboard may fail on non-HTTPS or if user denies; leave UI as-is
     }
   }, [inputs.companyName, inputs.industry, dateStr, scenarioLabel, generatedText])
+
+  const handleDownloadPDF = useCallback(() => {
+    downloadPDFReport({
+      companyName: inputs.companyName,
+      industry: inputs.industry,
+      scenarioLabel,
+      dateStr,
+      results,
+      currency,
+      generatedMemo: generatedText,
+    })
+  }, [inputs.companyName, inputs.industry, scenarioLabel, dateStr, results, currency, generatedText])
 
   const handleStartNew = useCallback(() => {
     applyPreset('midmarket')
@@ -87,7 +117,6 @@ export function SummaryScreen(): JSX.Element {
 
   return (
     <div className="min-h-screen bg-brand-bg px-6 py-8">
-      <StepIndicator />
       <div className="mx-auto max-w-6xl">
         <div className="flex gap-8">
           <div className="flex-[6] space-y-4">
@@ -126,12 +155,15 @@ export function SummaryScreen(): JSX.Element {
                 <div className="whitespace-pre-wrap text-base leading-relaxed text-brand-text">
                   {generatedText}
                 </div>
-                <div className="mt-4 flex gap-2">
+                <div className="mt-4 flex flex-wrap gap-2">
                   <Button variant="secondary" size="sm" onClick={handleGenerate}>
                     Regenerate
                   </Button>
                   <Button variant="primary" size="sm" onClick={handleCopy}>
                     Copy to Clipboard
+                  </Button>
+                  <Button variant="secondary" size="sm" onClick={handleDownloadPDF}>
+                    Download PDF Report
                   </Button>
                 </div>
               </div>
@@ -143,6 +175,11 @@ export function SummaryScreen(): JSX.Element {
                   Unable to generate summary. Your financial results are still
                   valid above.
                 </p>
+                {errorMessage != null && (
+                  <p className="mt-2 text-sm text-brand-text">
+                    {errorMessage}
+                  </p>
+                )}
                 <Button
                   variant="primary"
                   size="sm"
@@ -158,13 +195,13 @@ export function SummaryScreen(): JSX.Element {
           <div className="flex-[4] space-y-3">
             <KPICard
               label="Total 3-Year Savings"
-              value={formatCurrencyFull(results.totalSavings3yr)}
+              value={formatCurrencyFull(results.totalSavings3yr, currency)}
               accent
               className="p-4"
             />
             <KPICard
               label="NPV"
-              value={formatCurrencyFull(results.npv)}
+              value={formatCurrencyFull(results.npv, currency)}
               accent
               className="p-4"
             />
@@ -181,13 +218,18 @@ export function SummaryScreen(): JSX.Element {
           </div>
         </div>
 
-        <div className="mt-8 flex justify-between">
+        <div className="mt-8 flex flex-wrap justify-between gap-2">
           <Button variant="secondary" onClick={() => navigate('/dashboard')}>
             ← Back to Dashboard
           </Button>
-          <Button variant="ghost" onClick={handleStartNew}>
-            Start New Analysis
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="secondary" onClick={handleDownloadPDF}>
+              Download PDF Report
+            </Button>
+            <Button variant="ghost" onClick={handleStartNew}>
+              Start New Analysis
+            </Button>
+          </div>
         </div>
       </div>
     </div>
