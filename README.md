@@ -1,34 +1,60 @@
 # ClearValue
 
-AI-powered TCO and Business Case Generator. Build a defensible, CFO-ready business case in under 3 minutes.
+AI-powered TCO and Business Case Generator for enterprise 
+storage decisions. Input your current environment, get a 
+CFO-ready business case in under 3 minutes.
 
-## Run locally
+Built by Sambhav Lamichhane · March 2026  
+Live demo: [clearvalue.vercel.app](https://clearvalue.vercel.app)
 
+---
+
+## Setup
 ```bash
 npm install
 cp .env.example .env
-# Edit .env and set VITE_HF_TOKEN=your_huggingface_token
+# Add your OpenRouter API key to .env (see below)
 npm run dev
 ```
 
-### Where to put the API token
+## Environment Variables
 
-**In the project root, edit the `.env` file** (create it from `.env.example` if needed):
-
-- **`VITE_HF_TOKEN`** — Your Hugging Face token (required for the Executive Summary on the Summary screen). The Executive Summary uses the Hugging Face Inference API with the Qwen model (`Qwen/Qwen3.5-27B:novita`).
-
-Create a token at [Hugging Face → Settings → Access Tokens](https://huggingface.co/settings/tokens) with **"Inference Providers"** (or "Make calls to Inference Providers") permission. Restart `npm run dev` after changing `.env`.
-
-## Build
-
-```bash
-npm run build
-npm run preview   # serve dist/ locally
+Create a `.env` file in the project root:
+```
+VITE_OPENROUTER_API_KEY=your_key_here
 ```
 
-## Deploy to Vercel
+Get a free API key at [openrouter.ai/settings/keys](https://openrouter.ai/settings/keys).  
+The key is used only for the AI Executive Summary on the Summary screen.  
+Set a spend limit on your key before sharing the app publicly.
 
-1. Push the repo to GitHub.
-2. In [Vercel](https://vercel.com), import the project and connect the repo.
-3. Add environment variable: **`VITE_HF_TOKEN`** = your Hugging Face token (required for the Executive Summary feature).
-4. Deploy. Client-side routes (`/inputs`, `/dashboard`, `/summary`) are handled by `vercel.json` rewrites.
+## Build & Deploy
+```bash
+npm run build
+npm run preview   # test production build locally
+```
+
+**Deploy to Vercel:**
+1. Push to GitHub
+2. Import project in Vercel
+3. Add environment variable: `VITE_OPENROUTER_API_KEY`
+4. Deploy — client-side routes are handled via `vercel.json`
+
+## How it works
+
+ClearValue models four value levers based on published research:
+
+| Lever | Source |
+|---|---|
+| Power & Cooling | Western Digital 2024, Everpure ESG Report 2024 |
+| Refresh Avoidance | Hitachi Vantara 2022, ESG Evergreen Study |
+| Admin Labor | ESG Economic Validation of Pure1, 2022 |
+| Downtime Risk | ITIC/EMA 2024, Everpure Evergreen//One SLA |
+
+All assumptions are labeled as Published Source or Industry 
+Estimate in the About This Tool section of the app.
+
+## Tech Stack
+
+React 18, TypeScript, Vite, Tailwind CSS, Recharts, 
+React Router v6, OpenRouter API (GPT-4.1-mini), Vercel
