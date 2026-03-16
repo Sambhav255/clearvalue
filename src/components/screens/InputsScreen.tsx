@@ -87,6 +87,12 @@ export function InputsScreen(): JSX.Element {
     navigate('/dashboard')
   }, [inputs, navigate])
 
+  const handleResetDefaults = useCallback(() => {
+    applyPreset('midmarket')
+    updateField('companyName', 'Acme Corp')
+    updateField('industry', 'Technology')
+  }, [applyPreset, updateField])
+
   const clamp = useCallback(
     (key: keyof typeof CLAMP, value: number) => {
       const range = CLAMP[key]
@@ -106,9 +112,18 @@ export function InputsScreen(): JSX.Element {
           </div>
         )}
         <Card className="p-8">
-          <h2 className="mb-6 text-lg font-semibold text-brand-navy">
-            Company Profile
-          </h2>
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-brand-navy">
+              Company Profile
+            </h2>
+            <button
+              type="button"
+              onClick={handleResetDefaults}
+              className="rounded-lg border border-brand-border px-3 py-1.5 text-xs font-medium text-brand-textSecondary transition-colors duration-200 hover:border-brand-orange hover:text-brand-orange"
+            >
+              Reset to Defaults
+            </button>
+          </div>
           <div className="space-y-4">
             <div>
               <label className="mb-1 block text-sm font-medium uppercase tracking-wide text-brand-textSecondary">
