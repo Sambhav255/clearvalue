@@ -44,7 +44,7 @@ export function LandingScreen(): JSX.Element {
         <h1 className="text-5xl font-bold tracking-tight text-brand-navy">
           ClearValue
         </h1>
-        <p className="mx-auto mt-3 max-w-lg text-center text-xl font-normal text-brand-text">
+        <p className="mx-auto mt-3 text-center text-xl font-normal text-brand-text">
           Translate infrastructure decisions into financial outcomes.
         </p>
         <p className="mt-4 text-center text-brand-textSecondary">

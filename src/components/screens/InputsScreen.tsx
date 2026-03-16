@@ -13,7 +13,7 @@ const CLAMP = {
   refreshCycleYears: { min: 1, max: 10 },
   adminFTEs: { min: 0.1, max: 50 },
   adminTimePct: { min: 1, max: 100 },
-  everpurePricePerTB: { min: 50, max: 1000 },
+  everpurePricePerTB: { min: 100, max: 2000 },
 } as const
 
 const INDUSTRIES = [
@@ -102,7 +102,7 @@ export function InputsScreen(): JSX.Element {
           <div className="rounded-xl border border-brand-orange bg-brand-orangeLight px-4 py-3 text-sm text-brand-text">
             Please fix the following: all required fields must be greater than
             zero and within the allowed range (Storage 1–100,000 TB; Power
-            $0.01–0.50/kWh; Refresh 1–10 yr; Admins 0.1–50 FTE; Admin time 1–100%; Everpure price $50–$1000/TB).
+            $0.01–0.50/kWh; Refresh 1–10 yr; Admins 0.1–50 FTE; Admin time 1–100%; Everpure price $100–$2,000/TB).
           </div>
         )}
         <Card className="p-8">
@@ -263,7 +263,7 @@ export function InputsScreen(): JSX.Element {
             <div>
               <label className="mb-1 flex items-center gap-1 text-sm font-medium uppercase tracking-wide text-brand-textSecondary">
                 Estimated Everpure Price ($/TB)
-                <Tooltip content="Everpure FlashArray mid-market pricing typically ranges $150-300/TB depending on configuration and contract terms. This is used to calculate payback period and ROI only — contact your Everpure rep for exact pricing.">
+                <Tooltip content="Estimated total Everpure investment per TB including hardware, software, and first-year subscription. Realistic ranges: SMB $500-700/TB, Mid-Market $400-500/TB, Enterprise $300-400/TB (volume pricing applies). Contact your Everpure account team for exact pricing. Used to calculate payback period and ROI only.">
                   <span className="inline-flex">
                     <Info className="h-4 w-4 text-brand-textMuted hover:text-brand-orange" />
                   </span>
